@@ -40,6 +40,8 @@ var localizationOptions = new RequestLocalizationOptions() // çoklu dil desteði 
 
 
 builder.Services.AddHttpClient<IWeatherService, WeatherService>();
+builder.Services.AddScoped<IDistanceService, DistanceService>();
+builder.Services.AddScoped<IRouteService, RouteService>();
 var app = builder.Build();
 
 // Pipeline

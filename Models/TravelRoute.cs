@@ -14,5 +14,6 @@ namespace SEYRİ_ALA.Models
         public string? MapGeoJson { get; set; }
         public double Latitude { get; set; }  // Enlem
         public double Longitude { get; set; } // Boylam
+        public double TotalDistance { get; set; } // KM cinsinden toplam mesafe
     }
 }
