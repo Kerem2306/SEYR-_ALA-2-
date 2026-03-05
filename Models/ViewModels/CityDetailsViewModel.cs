@@ -12,6 +12,11 @@
         public int FoodScore { get; set; }
         public bool IsFavorite { get; set; } // Kullanıcının favorisi mi? (Yeni özellik)
 
+        // --- 2. HAFTA: HAVA DURUMU İÇİN EKLENEN KISIM ---
+        public string? Temperature { get; set; } // Şehrin anlık sıcaklığı
+        public string? WeatherDescription { get; set; } // "Güneşli", "Bulutlu" gibi kısa özet
+        // -----------------------------------------------
+
         // Sadece gerekli yorum verileri
         public List<CommentViewModel> Comments { get; set; } = new();
     }

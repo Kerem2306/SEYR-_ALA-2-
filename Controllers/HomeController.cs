@@ -18,7 +18,6 @@ namespace SEYRİ_ALA.Controllers
 
         // Dependency Injection ile Repository'yi sisteme dahil ediyoruz
         public HomeController(ILogger<HomeController> logger, ICityRepository cityRepository)
-
         {
             _logger = logger;
             _cityRepository = cityRepository;
@@ -45,8 +44,7 @@ namespace SEYRİ_ALA.Controllers
         }
 
         // --- DETAY SAYFASI: Şehir Detayları, Yorumlar ve Favoriler ---
-       
-            public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
             var city = await _cityRepository.GetByIdAsync(id);
             if (city == null) return NotFound();
@@ -54,7 +52,7 @@ namespace SEYRİ_ALA.Controllers
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             int.TryParse(userIdString, out int userId);
 
-            // MODEL -> VIEWMODEL DÖNÜŞÜMÜ (Mühürleme işlemi)
+            // MODEL -> VIEWMODEL DÖNÜŞÜMÜ (2. Hafta Güncellemesi Dahil)
             var viewModel = new CityDetailsViewModel
             {
                 Id = city.Id,
@@ -66,6 +64,13 @@ namespace SEYRİ_ALA.Controllers
                 Latitude = city.Latitude,
                 Longitude = city.Longitude,
                 IsFavorite = city.Favorites.Any(f => f.UserId == userId),
+
+                // --- 2. HAFTA: HAVA DURUMU VERİLERİ ---
+                // Şimdilik statik veri basıyoruz, API entegrasyonu bir sonraki adım.
+                Temperature = "18°C",
+                WeatherDescription = "Parçalı Bulutlu",
+                // --------------------------------------
+
                 Comments = city.Comments.Select(c => new CommentViewModel
                 {
                     Id = c.Id,
@@ -77,17 +82,16 @@ namespace SEYRİ_ALA.Controllers
             };
 
             return View(viewModel);
-        } // <--- Detay metodu burada kapandi
+        }
 
         // --- YORUM EKLEME ---
         [HttpPost]
-        [Authorize] // Sadece giris yapanlar yorum yapabilir
+        [Authorize]
         public async Task<IActionResult> AddComment(int CityId, string Content)
         {
             if (string.IsNullOrWhiteSpace(Content))
                 return RedirectToAction("Details", new { id = CityId });
 
-            // Giris yapan kullanicinin ID'sini Claim uzerinden aliyoruz
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (int.TryParse(userIdString, out int userId))
@@ -101,7 +105,6 @@ namespace SEYRİ_ALA.Controllers
                     IsApproved = true
                 };
 
-                // Repository uzerinden kayit islemi
                 await _cityRepository.AddCommentAsync(comment);
                 await _cityRepository.SaveChangesAsync();
             }
@@ -117,7 +120,6 @@ namespace SEYRİ_ALA.Controllers
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (int.TryParse(userIdString, out int userId))
             {
-                // Varsa siler, yoksa ekler (Repository icinde kurguladik)
                 await _cityRepository.ToggleFavoriteAsync(cityId, userId);
                 await _cityRepository.SaveChangesAsync();
                 TempData["FavoriteMessage"] = "Favori durumunuz güncellendi!";
@@ -131,10 +133,8 @@ namespace SEYRİ_ALA.Controllers
         public async Task<IActionResult> DeleteComment(int id)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            // Silinecek yorumu bul
             var comment = await _cityRepository.GetCommentByIdAsync(id);
 
-            // Yorum varsa ve silmek isteyen kisi yorumun sahibiyse sil
             if (comment != null && userIdString != null && comment.UserId.ToString() == userIdString)
             {
                 await _cityRepository.DeleteCommentAsync(comment);
@@ -152,8 +152,8 @@ namespace SEYRİ_ALA.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error() => View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 
-        // ------FAVORİ ŞEJİRLER SAYFASI---------
-        [Authorize] // Sadece giriş yapanlar görebilir
+        // ------ FAVORİ ŞEHİRLER SAYFASI ---------
+        [Authorize]
         public async Task<IActionResult> Favorites()
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -164,7 +164,5 @@ namespace SEYRİ_ALA.Controllers
             }
             return RedirectToAction("Login", "Account");
         }
-
-
-    } // <--- HomeController SINIFI BURADA KAPANIYOR
+    }
 }

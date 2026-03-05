@@ -66,9 +66,23 @@
                     </div>
                 </div>
             </div>
+
+            @* 2. HAFTA: HAVA DURUMU GÖSTERİM ALANI *@
+            <div class="weather-section mt-4 p-4 shadow-sm border-0" style="border-radius: 25px; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="text-primary fw-bold mb-1"><i class="fas fa-cloud-sun me-2"></i>Anlık Hava Durumu</h5>
+                        <p class="text-muted small mb-0">Seyri Ala Canlı Veri Sistemi</p>
+                    </div>
+                    <div class="text-end">
+                        <span class="display-5 fw-bold text-dark">@Model.Temperature</span>
+                        <p class="mb-0 fw-bold text-primary">@Model.WeatherDescription</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        @* SAĞ TARAF: ŞEHİR ANALİZİ (GELİŞTİRİLMİŞ) *@
+        @* SAĞ TARAF: ŞEHİR ANALİZİ *@
         <div class="col-lg-5">
             <div class="card border-0 shadow-sm p-4 h-100 analysis-card">
                 <h3 class="fw-bold mb-4">Keşif Karnesi</h3>
@@ -106,7 +120,6 @@
                     <small class="text-muted">Gurme damaklar için benzersiz lezzetler.</small>
                 </div>
 
-                @* YENİ: MERAK UYANDIRAN BİLGİ *@
                 <div class="explore-callout p-3 mt-auto">
                     <h6 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>Biliyor muydunuz?</h6>
                     <p class="small mb-0 text-muted">@Model.Name, bölgenin en çok merak edilen rotalarından biridir. Bu şehirde her köşe başında yeni bir sürpriz seni bekliyor.</p>
@@ -115,7 +128,7 @@
         </div>
     </div>
 
-    @* YORUM KISMI (YAPI KORUNDU, GÖRSEL İYİLEŞTİRİLDİ) *@
+    @* YORUM KISMI *@
     <div class="row mt-5 pb-5">
         <div class="col-lg-12">
             <h3 class="fw-bold mb-4"><i class="far fa-comments me-2"></i>Gezgin Yorumları (@Model.Comments.Count)</h3>
@@ -172,17 +185,15 @@
 </div>
 
 <style>
-    /* GENEL ARKA PLAN */
+    /* GENEL ARKA PLAN VE STYLE KURALLARI AYNI KALDI */
     body {
         background-color: #fcfaf7;
     }
-    /* Bej tonunda yumuşak arka plan */
 
-    /* GÖRSEL ALANI (Kırmızıdan Kurtuluş) */
     .img-container {
         border-radius: 30px;
         overflow: hidden;
-        background-color: #f1ede8; /* Bej/Nötr arka plan */
+        background-color: #f1ede8;
         height: 500px;
         display: flex;
         align-items: center;
@@ -195,7 +206,6 @@
         object-fit: cover;
     }
 
-    /* KART TASARIMLARI */
     .info-card, .analysis-card, .comment-form-card, .comment-bubble {
         border-radius: 25px;
         background: white;
@@ -207,7 +217,6 @@
         border: 1px solid #f2e9dc;
     }
 
-    /* FAVORİ BUTONU */
     .btn-favorite {
         padding: 12px 25px;
         border-radius: 50px;
@@ -228,14 +237,12 @@
             transform: scale(1.05);
         }
 
-    /* PROGRESS BARS */
     .custom-progress {
         height: 8px;
         border-radius: 10px;
         background-color: #f0f0f0;
     }
 
-    /* ANALİZ EKSTRA */
     .mini-fact {
         padding: 10px 20px;
         background: #f8f9fa;
@@ -248,7 +255,6 @@
         color: #0056b3;
     }
 
-    /* YORUM AVATAR */
     .avatar {
         width: 40px;
         height: 40px;
@@ -261,17 +267,17 @@
         font-weight: bold;
     }
 
-    .comment-bubble {
-        transition: transform 0.2s;
-    }
-
-        .comment-bubble:hover {
-            transform: translateX(5px);
-        }
-
     .description-text {
         line-height: 1.8;
         color: #4a4a4a;
         font-size: 1.1rem;
     }
+
+    .weather-section {
+        transition: transform 0.3s ease;
+    }
+
+        .weather-section:hover {
+            transform: translateY(-5px);
+        }
 </style>
