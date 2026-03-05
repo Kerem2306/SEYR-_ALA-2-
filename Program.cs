@@ -1,8 +1,9 @@
 
-using SEYRÝ_ALA.Data.Interfaces;
-using SEYRÝ_ALA.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 using SEYRÝ_ALA.Data; 
+using SEYRÝ_ALA.Data.Interfaces;
+using SEYRÝ_ALA.Data.Repositories;
+using SEYRÝ_ALA.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,8 @@ var localizationOptions = new RequestLocalizationOptions() // çoklu dil desteði 
     .AddSupportedCultures(supportedCultures)
     .AddSupportedUICultures(supportedCultures);
 
+
+builder.Services.AddHttpClient<IWeatherService, WeatherService>();
 var app = builder.Build();
 
 // Pipeline
