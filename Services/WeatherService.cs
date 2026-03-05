@@ -22,10 +22,21 @@ namespace SEYRİ_ALA.Services
             var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                var data = await response.Content.ReadFromJsonAsync<dynamic>();
-                double? temp = (double?)data?.main?.temp;
-                string? condition = (string?)data?.weather[0]?.description;
-                return (temp, condition);
+                // 'dynamic' yerine JsonElement kullanarak veriyi daha sağlam okuyoruz
+                var data = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+
+                try
+                {
+                    // Veriyi güvenli bir şekilde çekiyoruz
+                    double? temp = data.GetProperty("main").GetProperty("temp").GetDouble();
+                    string? condition = data.GetProperty("weather")[0].GetProperty("description").GetString();
+
+                    return (temp, condition);
+                }
+                catch (Exception)
+                {
+                    return (null, null);
+                }
             }
             return (null, null);
         }
