@@ -22,9 +22,13 @@ namespace SEYRİ_ALA.Models
         public int NatureScore { get; set; }
         public int FoodScore { get; set; }
 
+        // --- HAFTA 4: BEĞENİ SİSTEMİ İÇİN EKLENEN SAYAÇ ---
+        public int LikeCount { get; set; } = 0;
+
         // Şehre yapılan yorumların listesi
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
-        // City.cs içine ekle
+
+        // Favori İlişkisi (Zaten eklemişsin, kalsın kardo)
         public virtual ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
 
         public string? WeatherCondition { get; set; } // "Güneşli", "Yağmurlu" vb.

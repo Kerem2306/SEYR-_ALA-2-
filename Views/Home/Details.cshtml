@@ -6,6 +6,7 @@
 }
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
 <div class="container mt-5">
 
@@ -67,16 +68,18 @@
                 </div>
             </div>
 
-            @* 2. HAFTA: HAVA DURUMU GÖSTERİM ALANI *@
-            <div class="weather-section mt-4 p-4 shadow-sm border-0" style="border-radius: 25px; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);">
-                <div class="d-flex justify-content-between align-items-center">
+            @* --- HAVA DURUMU ALANI: STATİK VERİLER SİLİNDİ, CANLI SLOT GELDİ --- *@
+            <div class="weather-section mt-4 p-4 shadow-sm border-0" style="border-radius: 25px; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); min-height: 120px;">
+                <div class="d-flex justify-content-between align-items-center h-100">
                     <div>
                         <h5 class="text-primary fw-bold mb-1"><i class="fas fa-cloud-sun me-2"></i>Anlık Hava Durumu</h5>
-                        <p class="text-muted small mb-0">Seyri Ala Canlı Veri Sistemi</p>
+                        <p class="text-muted small mb-0" id="weather-status">API Bağlantısı Kuruluyor...</p>
                     </div>
-                    <div class="text-end">
-                        <span class="display-5 fw-bold text-dark">@Model.Temperature</span>
-                        <p class="mb-0 fw-bold text-primary">@Model.WeatherDescription</p>
+                    <div class="text-end" id="weather-display-area">
+                        @* Statik rakamlar silindi, yerine siber spinner geldi *@
+                        <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -86,7 +89,6 @@
         <div class="col-lg-5">
             <div class="card border-0 shadow-sm p-4 h-100 analysis-card">
                 <h3 class="fw-bold mb-4">Keşif Karnesi</h3>
-
                 <div class="analysis-item mb-4">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="fw-bold"><i class="fas fa-monument me-2 text-warning"></i>Tarihi Doku</span>
@@ -95,9 +97,7 @@
                     <div class="progress custom-progress">
                         <div class="progress-bar bg-warning" style="width: @(Model.HistoryScore * 10)%"></div>
                     </div>
-                    <small class="text-muted">Bu şehir binlerce yıllık hikayeler barındırıyor.</small>
                 </div>
-
                 <div class="analysis-item mb-4">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="fw-bold"><i class="fas fa-tree me-2 text-success"></i>Doğal Yapı</span>
@@ -106,9 +106,7 @@
                     <div class="progress custom-progress">
                         <div class="progress-bar bg-success" style="width: @(Model.NatureScore * 10)%"></div>
                     </div>
-                    <small class="text-muted">Doğa ile iç içe, huzurlu bir kaçış noktası.</small>
                 </div>
-
                 <div class="analysis-item mb-4">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="fw-bold"><i class="fas fa-utensils me-2 text-danger"></i>Gastronomi</span>
@@ -117,12 +115,10 @@
                     <div class="progress custom-progress">
                         <div class="progress-bar bg-danger" style="width: @(Model.FoodScore * 10)%"></div>
                     </div>
-                    <small class="text-muted">Gurme damaklar için benzersiz lezzetler.</small>
                 </div>
-
                 <div class="explore-callout p-3 mt-auto">
                     <h6 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>Biliyor muydunuz?</h6>
-                    <p class="small mb-0 text-muted">@Model.Name, bölgenin en çok merak edilen rotalarından biridir. Bu şehirde her köşe başında yeni bir sürpriz seni bekliyor.</p>
+                    <p class="small mb-0 text-muted">@Model.Name, bölgenin en çok merak edilen rotalarından biridir.</p>
                 </div>
             </div>
         </div>
@@ -132,7 +128,6 @@
     <div class="row mt-5 pb-5">
         <div class="col-lg-12">
             <h3 class="fw-bold mb-4"><i class="far fa-comments me-2"></i>Gezgin Yorumları (@Model.Comments.Count)</h3>
-
             @if (User.Identity.IsAuthenticated)
             {
                 <div class="card border-0 shadow-sm p-4 mb-4 comment-form-card">
@@ -146,7 +141,6 @@
                     </form>
                 </div>
             }
-
             <div class="comment-list">
                 @if (Model.Comments != null && Model.Comments.Any())
                 {
@@ -156,28 +150,12 @@
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <div class="d-flex align-items-center">
                                     <div class="avatar me-3">@comment.UserName.Substring(0, 1).ToUpper()</div>
-                                    <div>
-                                        <span class="fw-bold">@comment.UserName</span>
-                                        <div class="text-muted" style="font-size: 0.75rem;">@comment.CreatedAt.ToShortDateString()</div>
-                                    </div>
+                                    <div><span class="fw-bold">@comment.UserName</span></div>
                                 </div>
-                                @if (comment.IsBelongsToUser)
-                                {
-                                    <form asp-action="DeleteComment" asp-route-id="@comment.Id" method="post" onsubmit="return confirm('Silmek istediğine emin misin?')">
-                                        <button type="submit" class="btn btn-link text-danger p-0"><i class="fas fa-trash-alt"></i></button>
-                                    </form>
-                                }
                             </div>
                             <p class="mb-0 text-secondary ps-5">@comment.Text</p>
                         </div>
                     }
-                }
-                else
-                {
-                    <div class="text-center py-5">
-                        <i class="far fa-comment-dots fa-3x text-light mb-3"></i>
-                        <p class="text-muted">Henüz kimse yorum yapmamış. İlk gezgin sen ol!</p>
-                    </div>
                 }
             </div>
         </div>
@@ -185,7 +163,6 @@
 </div>
 
 <style>
-    /* GENEL ARKA PLAN VE STYLE KURALLARI AYNI KALDI */
     body {
         background-color: #fcfaf7;
     }
@@ -222,9 +199,7 @@
         border-radius: 50px;
         background: white;
         border: 1px solid #eee;
-        color: #6c757d;
-        font-weight: bold;
-        transition: all 0.3s;
+        transition: 0.3s;
     }
 
         .btn-favorite.active {
@@ -233,26 +208,9 @@
             background: #fff5f5;
         }
 
-        .btn-favorite:hover {
-            transform: scale(1.05);
-        }
-
     .custom-progress {
         height: 8px;
         border-radius: 10px;
-        background-color: #f0f0f0;
-    }
-
-    .mini-fact {
-        padding: 10px 20px;
-        background: #f8f9fa;
-        border-radius: 15px;
-    }
-
-    .explore-callout {
-        background: #e7f0ff;
-        border-radius: 20px;
-        color: #0056b3;
     }
 
     .avatar {
@@ -267,12 +225,6 @@
         font-weight: bold;
     }
 
-    .description-text {
-        line-height: 1.8;
-        color: #4a4a4a;
-        font-size: 1.1rem;
-    }
-
     .weather-section {
         transition: transform 0.3s ease;
     }
@@ -281,3 +233,48 @@
             transform: translateY(-5px);
         }
 </style>
+
+@* --- SİBER DİNAMİK ANAHTAR YAKALAYICI MOTORU --- *@
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        const displayArea = document.getElementById("weather-display-area");
+        const statusText = document.getElementById("weather-status");
+
+        const lat = "@Model.Latitude".replace(',', '.');
+        const lon = "@Model.Longitude".replace(',', '.');
+        const cityId = "@Model.Id";
+
+        try {
+            // Hilal'in backend API ucu
+            const response = await fetch(`/City/GetWeather?cityId=${cityId}&lat=${lat}&lon=${lon}`);
+
+            // Debug için konsola bakalım
+            const textData = await response.text();
+            console.log("Hilal'den Gelen Ham Paket:", textData);
+
+            const data = JSON.parse(textData);
+
+            if (data) {
+                // Hilal'in JSON anahtarlarını tarıyoruz: Temperature, temperature, temp, sicaklik...
+                let temp = data.Temperature ?? data.temperature ?? data.temp ?? data.sicaklik ?? (data.main ? data.main.temp : null);
+                let desc = data.WeatherDescription ?? data.weatherDescription ?? data.description ?? data.durum ?? (data.weather ? data.weather[0].description : null);
+
+                if (temp !== null) {
+                    statusText.innerText = "Canlı Atmosfer Verisi Aktif";
+                    displayArea.innerHTML = `
+                        <div class="animate__animated animate__fadeInRight">
+                            <span class="display-4 fw-bold text-dark">${Math.round(temp)}°C</span>
+                            <p class="mb-0 fw-bold text-primary text-capitalize">${desc || "Açık"}</p>
+                        </div>
+                    `;
+                } else {
+                    throw new Error("Anahtar bulunamadı.");
+                }
+            }
+        } catch (error) {
+            console.error("Siber Bağlantı Hatası:", error);
+            statusText.innerText = "Veri Alınamadı (API Çevrimdışı)";
+            displayArea.innerHTML = `<i class="fas fa-exclamation-triangle text-danger fa-2x"></i>`;
+        }
+    });
+</script>
