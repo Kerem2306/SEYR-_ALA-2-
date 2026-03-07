@@ -15,39 +15,44 @@ namespace SEYRİ_ALA.Services
             _distanceService = distanceService;
         }
 
-        // 1. METOT: Mesafeyi hesaplayan kısım (Interface'den gelen)
         public async Task<double> CalculateTotalDistanceAsync(List<int> cityIds)
         {
+            if (cityIds == null || !cityIds.Any()) return 0;
+
+            // 1. Siber İyileştirme: Veriyi hızlıca çek
             var cities = await _context.Cities
+                .AsNoTracking() // Takibe alma, sadece oku (Performans artışı)
                 .Where(c => cityIds.Contains(c.Id))
                 .ToListAsync();
 
-            // ID sırasına göre şehirleri diziyoruz
-            var orderedCities = cityIds.Select(id => cities.First(c => c.Id == id)).ToList();
+            // 2. Siber İyileştirme: Güvenli sıralama (Sadece var olan şehirleri al)
+            var orderedCities = cityIds
+                .Select(id => cities.FirstOrDefault(c => c.Id == id))
+                .Where(c => c != null) // Bulunamayan şehirleri listeden çıkar (Çökmeyi engeller)
+                .ToList();
 
             double totalDistance = 0;
 
             for (int i = 0; i < orderedCities.Count - 1; i++)
             {
+                // Derece bazlı koordinatları mesafe servisine gönder
                 totalDistance += _distanceService.CalculateDistance(
-                    orderedCities[i].Latitude, orderedCities[i].Longitude,
-                    orderedCities[i + 1].Latitude, orderedCities[i + 1].Longitude);
+                    orderedCities[i]!.Latitude, orderedCities[i]!.Longitude,
+                    orderedCities[i + 1]!.Latitude, orderedCities[i + 1]!.Longitude);
             }
 
             return totalDistance;
         }
 
-        // 2. METOT: Veritabanına kaydeden kısım
         public async Task<int> CreateRouteAsync(string routeName, List<int> cityIds)
         {
-            // Hata aldığın yer burasıydı, artık yukarıdaki metodu görebilecek
             double totalDistance = await CalculateTotalDistanceAsync(cityIds);
 
             var newRoute = new TravelRoute
             {
                 Title = routeName,
                 TotalDistance = totalDistance,
-                Description = "Hafta 3 Test Rotası" // Modelindeki zorunlu alanlar
+                Description = $"{routeName} rotası - Toplam mesafe: {totalDistance:F2} KM" // Daha zengin içerik
             };
 
             _context.Routes.Add(newRoute);
